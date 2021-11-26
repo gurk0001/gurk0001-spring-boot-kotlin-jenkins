@@ -1,0 +1,10 @@
+version: "3"
+services:
+  jenkins:
+    image: 'popyeindia/popye-jenkins:0.0.1'
+    ports:
+      - '4222:8080'
+  archiva:
+    image: xetusoss/archiva
+    ports:
+      - '4333:8080'
