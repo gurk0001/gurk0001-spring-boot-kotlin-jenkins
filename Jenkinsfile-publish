@@ -1,0 +1,17 @@
+pipeline {
+    agent any
+
+    environment {
+        ARCHIVA = credentials('archiva')
+        ARCHIVA_URL = "archiva:8080"
+    }
+    stages {
+        stage('Publish') {
+            steps {
+                git 'https://github.com/gurk0001/gradle-credentials-jenkins.git'
+
+                sh './gradlew publish --info --stacktrace'
+            }
+        }
+    }
+}
