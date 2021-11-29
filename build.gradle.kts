@@ -6,7 +6,11 @@ plugins {
     id("maven-publish")
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.spring") version "1.6.0"
+
+    id("com.palantir.docker") version "0.31.0"
+    id("com.palantir.docker-compose") version "0.31.0"
 }
+
 
 group = "com.gurk0001"
 version = "0.0.1-SNAPSHOT"
@@ -18,11 +22,35 @@ configurations {
     }
 }
 
+tasks.create("fetch") {
+    doFirst {
+        getArchivaUrlStr()
+    }
+}
+
+fun getArchivaUrlStr(): java.net.URI {
+    val archivaUrl = System.getenv("ARCHIVA_URL")
+    println("ARCHIVA URL: $archivaUrl")
+    val releasesRepoUrl = uri("http://$archivaUrl/repository/releases")
+    val snapshotsRepoUrl = uri("http://$archivaUrl/repository/snapshots")
+    return if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+}
+
 repositories {
     mavenCentral()
+    mavenLocal()
+    maven {
+        url = getArchivaUrlStr()
+        isAllowInsecureProtocol = true
+        credentials {
+            username = System.getenv("ARCHIVA_USR")
+            password = System.getenv("ARCHIVA_PSW")
+        }
+    }
 }
 
 dependencies {
+    implementation("com.gurk0001:kotlin-library:0.0.5")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -49,8 +77,7 @@ tasks.withType<Test> {
 publishing {
     repositories {
         maven {
-            val ARCHIVA_URL = System.getenv("ARCHIVA_URL")
-            url = uri("http://${ARCHIVA_URL}/repository/snapshots")
+            url = uri(getArchivaUrlStr())
             isAllowInsecureProtocol = true
             credentials {
                 username = System.getenv("ARCHIVA_USR")
@@ -80,5 +107,11 @@ publishing {
             }
         }
     }
+}
+
+docker {
+    name = "${project.name}:${project.version}"
+    files("plugins.txt", "seedJob.xml")
+    setDockerfile(file("Dockerfile"))
 }
 

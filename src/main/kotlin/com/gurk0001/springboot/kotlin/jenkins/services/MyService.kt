@@ -7,6 +7,7 @@ import java.time.Instant
 class MyService {
 
     fun getCurrentDateInSeconds():Long{
+        val a:com.gurk0001.dto.Company5
         return Instant.now().epochSecond
     }
 }

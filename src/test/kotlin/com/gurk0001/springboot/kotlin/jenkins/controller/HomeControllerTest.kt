@@ -22,9 +22,7 @@ internal class HomeControllerTest {
 
     @Test
     fun testHomeController() {
-
         Mockito.`when`(myService.getCurrentDateInSeconds()).thenReturn(Instant.now().epochSecond)
-
         var res = webTestClient.get()
             .uri("/api/v1/home")
             .exchange().expectStatus().isOk

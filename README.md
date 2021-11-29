@@ -13,7 +13,23 @@ at [tomgregory.com](https://www.tomgregory.com).
   docker push  popyeindia/popye-jenkins:0.0.1
   ```
 
-## Running
+## Setting `gradlew docker` plugin in spring boot using `build.gradle.kts`
+```
+plugins {
+    id("com.palantir.docker") version "0.31.0"
+    id("com.palantir.docker-compose") version "0.31.0"
+}
+
+docker {
+    name = "${project.name}:${project.version}"
+    files("plugins.txt", "seedJob.xml")
+    setDockerfile(file("Dockerfile"))
+}
+```
+**Note:** 
+Make sure you have `plugins.txt` and `seedJob.xml` file under your root folder to make this work exactly how it is specified here.
+
+## Running using `gradlew docker` plugin command
 
 `./gradlew docker dockerComposeUp`
 
@@ -21,7 +37,7 @@ This will run:
 * Jenkins
 * Archiva
 
-## Stopping
+## Stopping `gradlew docker` plugin command
 
 `./gradlew docker dockerComposeUp` or `docker-compose down`
 
